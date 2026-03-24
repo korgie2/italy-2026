@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<title>Italy 2026</title>
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Italy 2026" />
+<meta name="theme-color" content="#3d4a35" />
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMTgwIj48cmVjdCB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgcng9IjQwIiBmaWxsPSIjM2Q0YTM1Ii8+PHRleHQgeD0iOTAiIHk9IjExNSIgZm9udC1zaXplPSI5MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZiIgZm9udC1mYW1pbHk9InNlcmlmIj5JVDwvdGV4dD48L3N2Zz4=" />
+<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiSXRhbHkgMjAyNiAtIEFsZXggJiBLYXRoZXJpbmUiLCJzaG9ydF9uYW1lIjoiSXRhbHkgMjAyNiIsInN0YXJ0X3VybCI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjZmFmYWY3IiwidGhlbWVfY29sb3IiOiIjM2Q0YTM1In0=" />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { font-family: 'DM Sans', 'Helvetica Neue', sans-serif; background: #fafaf7; -webkit-font-smoothing: antialiased; }
+  html { scroll-behavior: smooth; }
+  ::-webkit-scrollbar { height: 4px; width: 4px; }
+  ::-webkit-scrollbar-thumb { background: #d4c9b5; border-radius: 4px; }
+  input, select, button { font-family: inherit; }
+  @supports(padding: env(safe-area-inset-top)) {
+    .header-safe { padding-top: calc(env(safe-area-inset-top) + 20px) !important; }
+    .bottom-safe { padding-bottom: calc(env(safe-area-inset-bottom) + 20px) !important; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+const { useState, useEffect, useCallback, useRef } = React;
+
+/* ═══════════════════ DESIGN TOKENS ═══════════════════ */
+const T = {
+  sage: "#7a8c6e", sageDark: "#5a6b4e", sageDeep: "#3d4a35", sageMuted: "#94a688",
+  sagePale: "#e8ede4", sageWash: "#f4f6f2", cream: "#fafaf7", warm: "#f7f5f0",
+  text: "#2a2a28", textMid: "#5c5c58", textLight: "#8a8a85", textFaint: "#b0b0aa",
+  border: "#e2e0da", borderLight: "#eeedea", white: "#ffffff",
+  warning: "#c4854c", warningBg: "#fdf6ef", warningBorder: "#f0dcc8",
+  danger: "#b05050", dangerBg: "#fdf2f2", dangerBorder: "#eacaca",
+  success: "#5a7a52", successBg: "#f0f5ee", successBorder: "#c8dac2",
+};
+
+/* ═══════════════════ BASE TRIP DATA ═══════════════════ */
+const BASE_DAYS = [
+  { date: "May 6", weekday: "Wed", title: "New York to Rome", subtitle: "Departure", location: "New York", region: "transit", color: T.sageDeep,
+    transit: [{ id: "t1", type: "flight", label: "JFK to Rome Fiumicino", details: { "Departure": "7:55 PM", "Airport": "JFK — Terminal 8", "Carrier": "American Airlines 236", "Seats": "36D, 36E", "Confirmation": "QDRJWY", "Leave home": "4:00 PM" }, status: "booked" }],
+    hotel: null, activities: [], reservations: [] },
+  { date: "May 7", weekday: "Thu", title: "Rome to Naples", subtitle: "Arrival & Transit", location: "Naples", region: "naples", color: "#6b7a5e",
+    transit: [
+      { id: "t2", type: "flight", label: "Arrive Rome FCO", details: { "Arrival": "10:20 AM", "Terminal": "Terminal 3" }, status: "booked" },
+      { id: "t3", type: "train", label: "FCO to Roma Termini to Napoli Termini", details: { "Route": "FCO — Roma Termini — Napoli Termini" }, status: "booked" },
+    ],
+    hotel: { name: "De Bonart Naples", address: "Corso Vittorio Emanuele 133, Naples 80121", confirmation: "#3440890791", note: "~10 min drive from train station", status: "booked", checkIn: true, url: "https://www.debonartnaples.com/en/index.php" },
+    activities: [{ id: "a1", text: "Explore Naples on foot, settle in", status: "planned" }, { id: "a2", text: "Relaxed arrival evening", status: "planned" }],
+    reservations: [] },
+  { date: "May 8", weekday: "Fri", title: "Naples", subtitle: "Culture & Discovery", location: "Naples", region: "naples", color: "#7a6b5e",
+    transit: [],
+    hotel: { name: "De Bonart Naples", address: "Corso Vittorio Emanuele 133, Naples 80121", confirmation: "#3430974597", note: "May require re-check-in", status: "booked", checkIn: false, url: "https://www.debonartnaples.com/en/index.php" },
+    activities: [{ id: "a3", text: "Museums", status: "planned" }], reservations: [] },
+  { date: "May 9", weekday: "Sat", title: "Naples to Sorrento", subtitle: "Coastal Transition", location: "Sorrento", region: "sorrento", color: "#5e7a7a",
+    transit: [{ id: "t4", type: "train", label: "Naples to Sorrento", details: { "By rail": "~1h 45min", "By car": "~1h" }, status: "booked" }],
+    hotel: { name: "La Tuja Relais du Parc", address: "Via Matignano 3, 80069 Vico Equense NA", confirmation: "#49932650", note: "45 min drive from Naples hotel", status: "booked", checkIn: true, url: "https://www.latujarelaisduparc.com/en/" },
+    activities: [{ id: "a4", text: "Beach day near Amalfi", status: "planned" }], reservations: [] },
+  { date: "May 10", weekday: "Sun", title: "Sorrento", subtitle: "History & Countryside", location: "Sorrento", region: "sorrento", color: "#7a7a5e",
+    transit: [],
+    hotel: { name: "La Tuja Relais du Parc", address: "Via Matignano 3, 80069 Vico Equense NA", confirmation: "#49932650", note: "Same hotel", status: "booked", checkIn: false, url: "https://www.latujarelaisduparc.com/en/" },
+    activities: [{ id: "a5", text: "Pompeii", status: "planned" }, { id: "a6", text: "Countryside dinner", status: "planned" }], reservations: [] },
+  { date: "May 11", weekday: "Mon", title: "Sorrento", subtitle: "Open Day", location: "Sorrento", region: "sorrento", color: "#5e6b7a",
+    transit: [],
+    hotel: { name: "La Tuja Relais du Parc", address: "Via Matignano 3, 80069 Vico Equense NA", confirmation: "#40951826", note: "May need re-check-in", status: "booked", checkIn: false, url: "https://www.latujarelaisduparc.com/en/" },
+    activities: [{ id: "a7", text: "Pompeii (if not May 10)", status: "planned" }, { id: "a8", text: "Beaches", status: "planned" }, { id: "a9", text: "Boat excursion", status: "planned" }], reservations: [] },
+  { date: "May 12", weekday: "Tue", title: "Sorrento to Rome", subtitle: "The Eternal City", location: "Rome", region: "rome", color: "#6b5e7a",
+    transit: [{ id: "t5", type: "train", label: "Sorrento to Rome", details: { "Status": "Booked" }, status: "planned" }],
+    hotel: { name: "The Tribune", address: "Via Campania 45, 00187 Roma", confirmation: "#34819232", note: "Near Borghese Gardens", status: "booked", checkIn: true, url: "https://www.hyatt.com/jdv-by-hyatt/en-US/romjd-the-tribune" },
+    activities: [{ id: "a10", text: "Roman Forum", status: "planned" }, { id: "a11", text: "Pantheon", status: "planned" }], reservations: [] },
+  { date: "May 13", weekday: "Wed", title: "Rome", subtitle: "Art & Heritage", location: "Rome", region: "rome", color: "#7a5e6b",
+    transit: [],
+    hotel: { name: "Palazzo Talia", address: "Via del Nazareno 25, 00187 Roma", confirmation: "#PT052026", note: "10 min from The Tribune", status: "booked", checkIn: true, url: "https://www.palazzotalia.com/en/" },
+    activities: [{ id: "a12", text: "Borghese Gallery", status: "planned" }, { id: "a13", text: "Vatican Museums", status: "planned" }], reservations: [] },
+  { date: "May 14", weekday: "Thu", title: "Rome to New York", subtitle: "Departure", location: "Rome", region: "transit", color: T.sageDeep,
+    transit: [{ id: "t6", type: "flight", label: "Rome FCO to JFK", details: { "Check out": "Leave hotel by 7:30 AM", "Carrier": "American Airlines 235", "Departure": "11:05 AM — Terminal 3", "Seats": "32L, 32K", "Confirmation": "QDRJWY" }, status: "booked" }],
+    hotel: null, activities: [], reservations: [] },
+];
+
+const PACKING = [
+  { name: "Documents & Essentials", items: ["Passport", "Phone & charger", "Travel adapter (Type C/F/L)", "Wallet & cards", "Printed confirmations", "Travel insurance"] },
+  { name: "Clothing", items: ["Walking shoes", "Sandals", "Shorts ×3", "Light trousers ×2", "T-shirts ×5", "Collared shirts ×2", "Light jacket", "Swimsuit", "Underwear ×8", "Socks ×5", "Sun hat", "Dinner outfit"] },
+  { name: "Toiletries", items: ["Sunscreen SPF 50", "Toothbrush & paste", "Deodorant", "Shampoo", "Medications", "First aid kit", "Insect repellent"] },
+  { name: "Gear", items: ["Camera & charger", "Headphones", "Portable battery", "Book / Kindle", "Day pack", "Water bottle", "Sunglasses"] },
+];
+
+const DAY_OPTIONS = BASE_DAYS.map(d => d.date);
+let _idCounter = 100;
+const newId = () => `item_${_idCounter++}_${Date.now()}`;
+
+/* ═══════════════════ WEBSOCKET SYNC ═══════════════════ */
+let ws = null;
+let wsReady = false;
+let onTripUpdate = null;
+let onPackingUpdate = null;
+let onSyncStatus = null;
+
+function connectWS() {
+  const proto = location.protocol === "https:" ? "wss" : "ws";
+  ws = new WebSocket(`${proto}://${location.host}/ws`);
+
+  ws.onopen = () => {
+    wsReady = true;
+    if (onSyncStatus) onSyncStatus("synced");
+  };
+
+  ws.onmessage = (e) => {
+    try {
+      const msg = JSON.parse(e.data);
+      if (msg.type === "init") {
+        if (msg.tripData && onTripUpdate) onTripUpdate(msg.tripData);
+        if (msg.packingData && onPackingUpdate) onPackingUpdate(msg.packingData);
+        if (onSyncStatus) onSyncStatus("synced");
+      } else if (msg.type === "update_trip") {
+        if (onTripUpdate) onTripUpdate(msg.data);
+      } else if (msg.type === "update_packing") {
+        if (onPackingUpdate) onPackingUpdate(msg.data);
+      }
+    } catch(err) { console.error("WS parse error", err); }
+  };
+
+  ws.onclose = () => {
+    wsReady = false;
+    if (onSyncStatus) onSyncStatus("reconnecting");
+    setTimeout(connectWS, 3000); // auto-reconnect
+  };
+
+  ws.onerror = () => {
+    if (onSyncStatus) onSyncStatus("error");
+  };
+}
+
+function saveTripData(data) {
+  try { localStorage.setItem("italy-trip-data", JSON.stringify(data)); } catch(e) {}
+  if (ws && wsReady) ws.send(JSON.stringify({ type: "update_trip", data }));
+}
+
+function savePackingData(data) {
+  try { localStorage.setItem("italy-packing-data", JSON.stringify(data)); } catch(e) {}
+  if (ws && wsReady) ws.send(JSON.stringify({ type: "update_packing", data }));
+}
+
+/* ═══════════════════ UI COMPONENTS ═══════════════════ */
+function StatusBadge({ status }) {
+  const map = {
+    booked: { bg: T.successBg, fg: T.success, border: T.successBorder, label: "Confirmed" },
+    planned: { bg: T.successBg, fg: T.success, border: T.successBorder, label: "Planned" },
+    tbd: { bg: T.warningBg, fg: T.warning, border: T.warningBorder, label: "TBD" },
+    missing: { bg: T.dangerBg, fg: T.danger, border: T.dangerBorder, label: "Missing" },
+  };
+  const s = map[status] || map.tbd;
+  return <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: 0.5, textTransform: "uppercase", padding: "3px 10px", borderRadius: 3, background: s.bg, color: s.fg, border: `1px solid ${s.border}` }}>{s.label}</span>;
+}
+function PriorityDot({ priority }) {
+  const c = { high: T.danger, medium: T.warning, low: T.sage };
+  return <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><span style={{ width: 7, height: 7, borderRadius: "50%", background: c[priority] || T.sage }} /><span style={{ fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.6, color: T.textLight }}>{priority}</span></span>;
+}
+function Card({ children, style: s, ...props }) { return <div style={{ background: T.white, borderRadius: 8, border: `1px solid ${T.border}`, ...s }} {...props}>{children}</div>; }
+function SectionHead({ children }) { return <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 2, color: T.sageMuted, marginBottom: 12, paddingBottom: 8, borderBottom: `1px solid ${T.borderLight}` }}>{children}</div>; }
+function Btn({ children, onClick, variant = "primary", style: s }) {
+  const base = { border: "none", cursor: "pointer", borderRadius: 4, fontSize: 12, fontWeight: 600, fontFamily: "'DM Sans',sans-serif", transition: "all 0.15s", letterSpacing: 0.3 };
+  const v = { primary: { ...base, background: T.sage, color: T.white, padding: "8px 18px" }, secondary: { ...base, background: T.sageWash, color: T.sageDark, padding: "8px 18px", border: `1px solid ${T.sagePale}` }, small: { ...base, background: T.sageWash, color: T.sageDark, padding: "5px 12px", fontSize: 11, border: `1px solid ${T.sagePale}` } };
+  return <button onClick={onClick} style={{ ...(v[variant]||v.primary), ...s }}>{children}</button>;
+}
+function FormField({ label, children }) { return <div style={{ marginBottom: 14 }}><label style={{ display: "block", fontSize: 11, fontWeight: 600, color: T.textLight, textTransform: "uppercase", letterSpacing: 1, marginBottom: 5 }}>{label}</label>{children}</div>; }
+const inputStyle = { width: "100%", padding: "10px 12px", border: `1px solid ${T.border}`, borderRadius: 4, fontSize: 14, fontFamily: "'DM Sans',sans-serif", color: T.text, background: T.white, boxSizing: "border-box", outline: "none" };
+const selectStyle = { ...inputStyle };
+
+function Modal({ title, onClose, children }) {
+  return <div style={{ position: "fixed", inset: 0, zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={onClose}>
+    <div style={{ position: "absolute", inset: 0, background: "rgba(42,42,40,0.4)", backdropFilter: "blur(2px)" }} />
+    <div onClick={e => e.stopPropagation()} style={{ position: "relative", background: T.white, borderRadius: 10, width: "100%", maxWidth: 440, maxHeight: "85vh", overflow: "auto", padding: "24px 28px", boxShadow: "0 20px 60px rgba(0,0,0,0.15)" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}><span style={{ fontSize: 18, fontWeight: 400, fontFamily: "'Cormorant Garamond',serif", color: T.text }}>{title}</span><span onClick={onClose} style={{ cursor: "pointer", fontSize: 22, color: T.textFaint, lineHeight: 1 }}>&times;</span></div>
+      {children}
+    </div>
+  </div>;
+}
+
+/* SetupScreen removed — app connects via WebSocket automatically */
+
+/* ═══════════════════ NAV & CONSTANTS ═══════════════════ */
+const NAV = [
+  { key: "dashboard", label: "Overview" }, { key: "timeline", label: "Timeline" },
+  { key: "hotels", label: "Hotels" }, { key: "transport", label: "Transport" },
+  { key: "activities", label: "Activities" }, { key: "reservations", label: "Reservations" },
+  { key: "packing", label: "Packing" },
+];
+
+/* ═══════════════════ MAIN APP ═══════════════════ */
+function App() {
+  const [page, setPage] = useState("dashboard");
+  const [days, setDays] = useState(null);
+  const [packing, setPacking] = useState({});
+  const [modal, setModal] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [syncStatus, setSyncStatus] = useState("connecting");
+
+  // Connect WebSocket and wire up callbacks
+  useEffect(() => {
+    // Load from localStorage immediately so app feels instant
+    const savedTrip = localStorage.getItem("italy-trip-data");
+    const savedPack = localStorage.getItem("italy-packing-data");
+    if (savedTrip) { setDays(JSON.parse(savedTrip)); setLoading(false); }
+    if (savedPack) setPacking(JSON.parse(savedPack));
+
+    // Wire up WS callbacks before connecting
+    onTripUpdate = (data) => { setDays(data); setLoading(false); try { localStorage.setItem("italy-trip-data", JSON.stringify(data)); } catch(e) {} };
+    onPackingUpdate = (data) => { setPacking(data); try { localStorage.setItem("italy-packing-data", JSON.stringify(data)); } catch(e) {} };
+    onSyncStatus = (s) => setSyncStatus(s);
+
+    connectWS();
+
+    // If no local data and WS hasn't given us anything after 2s, use BASE_DAYS
+    const timer = setTimeout(() => {
+      setDays(d => d || JSON.parse(JSON.stringify(BASE_DAYS)));
+      setLoading(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const updateDay = useCallback((dayIndex, updater) => {
+    setDays(prev => {
+      const next = JSON.parse(JSON.stringify(prev));
+      updater(next[dayIndex]);
+      saveTripData(next);
+      return next;
+    });
+  }, []);
+
+  const persist = useCallback((newDays) => { setDays(newDays); saveTripData(newDays); }, []);
+
+  const togglePacking = (cat, item) => {
+    setPacking(p => { const n = { ...p, [`${cat}-${item}`]: !p[`${cat}-${item}`] }; savePackingData(n); return n; });
+  };
+
+  const resetData = () => {
+    if (confirm("Reset all trip data to defaults? This cannot be undone.")) {
+      const fresh = JSON.parse(JSON.stringify(BASE_DAYS));
+      persist(fresh);
+      setPacking({});
+      savePackingData({});
+    }
+  };
+
+  if (loading || !days) return <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh", fontFamily: "'DM Sans',sans-serif", color: T.textLight, flexDirection: "column", gap: 8 }}><div style={{ width: 24, height: 24, border: `2px solid ${T.sagePale}`, borderTopColor: T.sage, borderRadius: "50%", animation: "spin 0.8s linear infinite" }} /><style>{"@keyframes spin{to{transform:rotate(360deg)}}"}</style><div style={{ fontSize: 13 }}>Syncing your trip...</div></div>;
+
+  /* ── Data helpers ── */
+  const allActions = [];
+  days.forEach((d, di) => {
+    d.activities.filter(a => a.status === "tbd").forEach(a => allActions.push({ text: a.text, day: d.date, dayTitle: d.title, priority: "medium" }));
+    d.transit.filter(t => t.status === "tbd").forEach(t => allActions.push({ text: `Book: ${t.label}`, day: d.date, dayTitle: d.title, priority: "high" }));
+    if (d.hotel?.status === "missing") allActions.push({ text: `${d.hotel.name} — confirmation missing`, day: d.date, dayTitle: d.title, priority: "high" });
+  });
+  const totalAct = days.flatMap(d => d.activities).length;
+  const plannedAct = days.flatMap(d => d.activities).filter(a => a.status !== "tbd").length;
+  const hotels = days.filter(d => d.hotel?.checkIn);
+  const bookedH = hotels.filter(d => d.hotel.status === "booked").length;
+  const totalRes = days.flatMap(d => d.reservations).length;
+
+  /* ── Mutation handlers ── */
+  const addReservation = (f) => { const di = days.findIndex(d => d.date === f.day); if (di < 0) return; updateDay(di, day => { day.reservations.push({ id: newId(), name: f.name, type: f.type, time: f.time, confirmation: f.confirmation, notes: f.notes, status: f.confirmation ? "booked" : "tbd" }); }); setModal(null); };
+  const addActivity = (f) => { const di = days.findIndex(d => d.date === f.day); if (di < 0) return; updateDay(di, day => { day.activities.push({ id: newId(), text: f.text, status: f.status || "tbd" }); }); setModal(null); };
+  const addTransit = (f) => { const di = days.findIndex(d => d.date === f.day); if (di < 0) return; updateDay(di, day => { const det = {}; if(f.carrier) det.Carrier=f.carrier; if(f.departure) det.Departure=f.departure; if(f.confirmation) det.Confirmation=f.confirmation; if(f.notes) det.Notes=f.notes; day.transit.push({ id: newId(), type: f.type, label: f.label, details: det, status: f.confirmation ? "booked" : "tbd" }); }); setModal(null); };
+  const deleteItem = (di, col, id) => updateDay(di, day => { day[col] = day[col].filter(x => x.id !== id); });
+  const toggleActivityStatus = (di, id) => updateDay(di, day => { const a = day.activities.find(x => x.id === id); if(a) a.status = a.status === "tbd" ? "planned" : "tbd"; });
+  const toggleTransitStatus = (di, id) => updateDay(di, day => { const t = day.transit.find(x => x.id === id); if(t) t.status = t.status === "tbd" ? "booked" : "tbd"; });
+  const toggleReservationStatus = (di, id) => updateDay(di, day => { const r = day.reservations.find(x => x.id === id); if(r) r.status = r.status === "tbd" ? "booked" : "tbd"; });
+  const updateHotel = (di, updates) => {
+    setDays(prev => {
+      const next = JSON.parse(JSON.stringify(prev));
+      if (next[di]?.hotel) { Object.assign(next[di].hotel, updates); const nm = next[di].hotel.name; next.forEach((d,i) => { if (i!==di && d.hotel?.name===nm && updates.url !== undefined) d.hotel.url = updates.url; }); }
+      saveTripData(next);
+      return next;
+    });
+  };
+
+  /* ── Form modals ── */
+  function ReservationForm() {
+    const [f, setF] = useState({ day: "May 7", name: "", type: "restaurant", time: "", confirmation: "", notes: "" });
+    return <Modal title="Add Reservation" onClose={() => setModal(null)}>
+      <FormField label="Day"><select value={f.day} onChange={e => setF({...f, day: e.target.value})} style={selectStyle}>{DAY_OPTIONS.map(d => <option key={d}>{d}</option>)}</select></FormField>
+      <FormField label="Type"><select value={f.type} onChange={e => setF({...f, type: e.target.value})} style={selectStyle}><option value="restaurant">Restaurant</option><option value="museum">Museum / Gallery</option><option value="tour">Tour / Excursion</option><option value="other">Other</option></select></FormField>
+      <FormField label="Name"><input value={f.name} onChange={e => setF({...f, name: e.target.value})} placeholder="e.g. Borghese Gallery" style={inputStyle} /></FormField>
+      <FormField label="Time"><input value={f.time} onChange={e => setF({...f, time: e.target.value})} placeholder="e.g. 7:30 PM" style={inputStyle} /></FormField>
+      <FormField label="Confirmation #"><input value={f.confirmation} onChange={e => setF({...f, confirmation: e.target.value})} placeholder="Optional" style={inputStyle} /></FormField>
+      <FormField label="Notes"><input value={f.notes} onChange={e => setF({...f, notes: e.target.value})} placeholder="Optional" style={inputStyle} /></FormField>
+      <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 8 }}><Btn variant="secondary" onClick={() => setModal(null)}>Cancel</Btn><Btn onClick={() => f.name && addReservation(f)}>Add</Btn></div>
+    </Modal>;
+  }
+  function ActivityForm() {
+    const [f, setF] = useState({ day: "May 7", text: "", status: "planned" });
+    return <Modal title="Add Activity" onClose={() => setModal(null)}>
+      <FormField label="Day"><select value={f.day} onChange={e => setF({...f, day: e.target.value})} style={selectStyle}>{DAY_OPTIONS.map(d => <option key={d}>{d}</option>)}</select></FormField>
+      <FormField label="Activity"><input value={f.text} onChange={e => setF({...f, text: e.target.value})} placeholder="e.g. Visit Capri" style={inputStyle} /></FormField>
+      <FormField label="Status"><select value={f.status} onChange={e => setF({...f, status: e.target.value})} style={selectStyle}><option value="tbd">TBD</option><option value="planned">Planned</option></select></FormField>
+      <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 8 }}><Btn variant="secondary" onClick={() => setModal(null)}>Cancel</Btn><Btn onClick={() => f.text && addActivity(f)}>Add</Btn></div>
+    </Modal>;
+  }
+  function TransitForm() {
+    const [f, setF] = useState({ day: "May 12", type: "train", label: "", carrier: "", departure: "", confirmation: "" });
+    return <Modal title="Add Transport" onClose={() => setModal(null)}>
+      <FormField label="Day"><select value={f.day} onChange={e => setF({...f, day: e.target.value})} style={selectStyle}>{DAY_OPTIONS.map(d => <option key={d}>{d}</option>)}</select></FormField>
+      <FormField label="Type"><select value={f.type} onChange={e => setF({...f, type: e.target.value})} style={selectStyle}><option value="train">Rail</option><option value="flight">Flight</option><option value="ferry">Ferry</option><option value="car">Car / Taxi</option></select></FormField>
+      <FormField label="Route"><input value={f.label} onChange={e => setF({...f, label: e.target.value})} placeholder="e.g. Sorrento to Rome" style={inputStyle} /></FormField>
+      <FormField label="Carrier"><input value={f.carrier} onChange={e => setF({...f, carrier: e.target.value})} placeholder="Optional" style={inputStyle} /></FormField>
+      <FormField label="Departure"><input value={f.departure} onChange={e => setF({...f, departure: e.target.value})} placeholder="Optional" style={inputStyle} /></FormField>
+      <FormField label="Confirmation #"><input value={f.confirmation} onChange={e => setF({...f, confirmation: e.target.value})} placeholder="Optional" style={inputStyle} /></FormField>
+      <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 8 }}><Btn variant="secondary" onClick={() => setModal(null)}>Cancel</Btn><Btn onClick={() => f.label && addTransit(f)}>Add</Btn></div>
+    </Modal>;
+  }
+  function HotelEditForm() {
+    const di = modal?.dayIndex; const hotel = days[di]?.hotel;
+    const [f, setF] = useState({ confirmation: hotel?.confirmation||"", note: hotel?.note||"", status: hotel?.status||"booked", url: hotel?.url||"" });
+    if (!hotel) return null;
+    return <Modal title={`Edit — ${hotel.name}`} onClose={() => setModal(null)}>
+      <FormField label="Confirmation #"><input value={f.confirmation} onChange={e => setF({...f, confirmation: e.target.value})} placeholder="Enter confirmation #" style={inputStyle} /></FormField>
+      <FormField label="Status"><select value={f.status} onChange={e => setF({...f, status: e.target.value})} style={selectStyle}><option value="booked">Confirmed</option><option value="tbd">TBD</option><option value="missing">Missing</option></select></FormField>
+      <FormField label="Hotel Website"><input value={f.url} onChange={e => setF({...f, url: e.target.value})} placeholder="https://..." style={inputStyle} /></FormField>
+      <FormField label="Notes"><input value={f.note} onChange={e => setF({...f, note: e.target.value})} placeholder="Optional" style={inputStyle} /></FormField>
+      <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 8 }}><Btn variant="secondary" onClick={() => setModal(null)}>Cancel</Btn><Btn onClick={() => { updateHotel(di, f); setModal(null); }}>Save</Btn></div>
+    </Modal>;
+  }
+
+  /* ── Dashboard ── */
+  const daysUntil = Math.max(0, Math.ceil((new Date("2026-05-06") - new Date()) / 86400000));
+  const PB = ({ v, t, c }) => <div style={{ height: 4, borderRadius: 4, background: T.borderLight, overflow: "hidden" }}><div style={{ height: "100%", width: `${t>0?(v/t)*100:0}%`, background: c, borderRadius: 4, transition: "width 0.4s" }} /></div>;
+
+  function renderDashboard() {
+    return <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+        <Card style={{ padding: "24px 20px", textAlign: "center", gridColumn: "1/-1", background: `linear-gradient(160deg,${T.sageDeep},${T.sageDark})`, color: T.white, border: "none" }}>
+          <div style={{ fontSize: 11, letterSpacing: 3, textTransform: "uppercase", opacity: 0.6, marginBottom: 4 }}>Departure In</div>
+          <div style={{ fontSize: 48, fontWeight: 300, fontFamily: "'Cormorant Garamond',serif", lineHeight: 1 }}>{daysUntil}</div>
+          <div style={{ fontSize: 12, opacity: 0.5, marginTop: 4 }}>days</div>
+        </Card>
+        {[{l:"Duration",v:"9 days"},{l:"Cities",v:"3"},{l:"Hotels",v:`${bookedH} of ${hotels.length}`},{l:"Reservations",v:`${totalRes}`}].map((s,i) => <Card key={i} style={{ padding: "16px 18px" }}><div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: 1.5, color: T.textFaint, marginBottom: 6 }}>{s.l}</div><div style={{ fontSize: 22, fontWeight: 400, fontFamily: "'Cormorant Garamond',serif", color: T.text }}>{s.v}</div></Card>)}
+      </div>
+      <Card style={{ padding: "20px 24px" }}>
+        <SectionHead>Planning Progress</SectionHead>
+        {[{l:"Flights",d:2,t:2},{l:"Hotels",d:bookedH,t:hotels.length},{l:"Activities",d:plannedAct,t:totalAct||1},{l:"Reservations",d:totalRes,t:Math.max(totalRes,1)}].map((b,i) => <div key={i} style={{ marginBottom: i<3?14:0 }}><div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 6 }}><span style={{ fontWeight: 600, color: T.textMid }}>{b.l}</span><span style={{ color: T.textFaint, fontFamily: "'IBM Plex Mono',monospace", fontSize: 11 }}>{b.d}/{b.t}</span></div><PB v={b.d} t={b.t} c={T.sage} /></div>)}
+      </Card>
+      {allActions.length > 0 && <Card style={{ padding: "20px 24px", border: `1px solid ${T.warningBorder}` }}>
+        <SectionHead>Open Items ({allActions.length})</SectionHead>
+        {allActions.map((a,i) => <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "10px 0", borderBottom: i<allActions.length-1?`1px solid ${T.borderLight}`:"none" }}><PriorityDot priority={a.priority} /><div style={{ flex: 1 }}><div style={{ fontSize: 13, color: T.text }}>{a.text}</div><div style={{ fontSize: 11, color: T.textFaint, marginTop: 2 }}>{a.day} — {a.dayTitle}</div></div></div>)}
+      </Card>}
+      <Card style={{ padding: "16px 24px", textAlign: "center" }}>
+        <div style={{ fontSize: 10, color: syncStatus === "synced" ? T.success : syncStatus === "error" ? T.danger : T.warning, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1 }}>{syncStatus === "synced" ? "● Live synced with Alex" : syncStatus === "reconnecting" ? "↻ Reconnecting..." : syncStatus === "error" ? "✕ Sync error" : "○ Connecting..."}</div>
+      </Card>
+      <div style={{ textAlign: "center" }}><button onClick={resetData} style={{ background: "none", border: "none", fontSize: 11, color: T.textFaint, cursor: "pointer", textDecoration: "underline" }}>Reset to defaults</button></div>
+    </div>;
+  }
+
+  /* ── Timeline ── */
+  function RenderTimeline() {
+    const [expanded, setExpanded] = useState(new Set([0]));
+    const toggle = i => setExpanded(p => { const n = new Set(p); n.has(i)?n.delete(i):n.add(i); return n; });
+    return <div>
+      <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginBottom: 14 }}><Btn variant="small" onClick={() => setExpanded(new Set(days.map((_,i)=>i)))}>Expand all</Btn><Btn variant="small" onClick={() => setExpanded(new Set())}>Collapse all</Btn></div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        {days.map((day,i) => {
+          const open = expanded.has(i);
+          const issues = day.transit.filter(t=>t.status==="tbd").length + day.activities.filter(a=>a.status==="tbd").length + (day.hotel?.status==="missing"?1:0);
+          return <Card key={i} style={{ overflow: "hidden" }}>
+            <div onClick={() => toggle(i)} style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 18px", cursor: "pointer", background: open?T.sageDeep:T.white, transition: "all 0.25s" }}>
+              <div style={{ textAlign: "center", minWidth: 38 }}><div style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: open?"rgba(255,255,255,0.5)":T.textFaint }}>{day.weekday}</div><div style={{ fontSize: 20, fontWeight: 300, fontFamily: "'Cormorant Garamond',serif", color: open?T.white:T.text, lineHeight: 1.1 }}>{day.date.split(" ")[1]}</div></div>
+              <div style={{ width: 1, height: 28, background: open?"rgba(255,255,255,0.15)":T.borderLight }} />
+              <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 500, color: open?T.white:T.text, fontFamily: "'Cormorant Garamond',serif" }}>{day.title}</div><div style={{ fontSize: 11, color: open?"rgba(255,255,255,0.55)":T.textFaint }}>{day.subtitle}</div></div>
+              <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                {day.reservations.length>0 && <span style={{ fontSize: 10, fontWeight: 600, color: open?"rgba(255,255,255,0.6)":T.sageMuted, background: open?"rgba(255,255,255,0.12)":T.sageWash, padding: "2px 7px", borderRadius: 3 }}>{day.reservations.length} res.</span>}
+                {issues>0 && <div style={{ width: 18, height: 18, borderRadius: "50%", background: open?"rgba(176,80,80,0.8)":T.warningBg, color: open?T.white:T.warning, fontSize: 10, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>{issues}</div>}
+                <div style={{ color: open?"rgba(255,255,255,0.4)":T.textFaint, fontSize: 12, transition: "transform 0.2s", transform: open?"rotate(180deg)":"rotate(0)" }}>&#9662;</div>
+              </div>
+            </div>
+            {open && <div style={{ padding: "14px 18px 18px", display: "flex", flexDirection: "column", gap: 12 }}>
+              {day.transit.map((t,ti) => <div key={ti} style={{ background: T.sageWash, borderRadius: 6, padding: "12px 16px", border: `1px solid ${T.sagePale}` }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}><span style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.5, color: T.sageMuted }}>{t.type} — {t.label}</span><span onClick={() => toggleTransitStatus(i,t.id)} style={{ cursor: "pointer" }}><StatusBadge status={t.status} /></span></div>
+                {Object.entries(t.details).map(([k,v]) => <div key={k} style={{ display: "flex", justifyContent: "space-between", padding: "3px 0", borderBottom: `1px solid ${T.sagePale}`, fontSize: 12 }}><span style={{ color: T.textLight }}>{k}</span><span style={{ fontWeight: 600, color: T.text, fontFamily: "'IBM Plex Mono',monospace" }}>{v}</span></div>)}
+              </div>)}
+              {day.hotel && <div style={{ borderRadius: 6, padding: "12px 16px", background: day.hotel.status==="missing"?T.dangerBg:T.warm, border: `1px solid ${day.hotel.status==="missing"?T.dangerBorder:T.border}` }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}><span style={{ fontSize: 14, fontWeight: 500, fontFamily: "'Cormorant Garamond',serif", color: T.text }}>{day.hotel.name}</span><div style={{ display: "flex", gap: 6, alignItems: "center" }}><StatusBadge status={day.hotel.status} /><span onClick={() => setModal({type:"hotel-edit",dayIndex:i})} style={{ cursor: "pointer", fontSize: 11, color: T.sage, fontWeight: 600 }}>Edit</span></div></div>
+                <div style={{ fontSize: 12, color: T.textLight }}>{day.hotel.address}</div>
+                {day.hotel.url && <a href={day.hotel.url} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: T.sage, textDecoration: "none", fontWeight: 600, display: "inline-block", marginTop: 3 }}>View website &#8599;</a>}
+                <div style={{ fontSize: 11, color: T.textFaint, marginTop: 3, fontFamily: "'IBM Plex Mono',monospace" }}>Conf: <strong style={{ color: day.hotel.status==="missing"?T.danger:T.textMid }}>{day.hotel.confirmation}</strong></div>
+              </div>}
+              {day.activities.length>0 && <div><div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 2, color: T.sageMuted, marginBottom: 6 }}>Activities</div>
+                {day.activities.map(a => <div key={a.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "5px 0", borderBottom: `1px solid ${T.borderLight}` }}><span style={{ fontSize: 13, color: T.textMid }}>{a.text}</span><div style={{ display: "flex", gap: 5, alignItems: "center" }}><span onClick={() => toggleActivityStatus(i,a.id)} style={{ cursor: "pointer" }}><StatusBadge status={a.status} /></span><span onClick={() => deleteItem(i,"activities",a.id)} style={{ cursor: "pointer", fontSize: 14, color: T.textFaint }}>&times;</span></div></div>)}
+              </div>}
+              {day.reservations.length>0 && <div><div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 2, color: T.sageMuted, marginBottom: 6 }}>Reservations</div>
+                {day.reservations.map(r => <div key={r.id} style={{ background: T.sageWash, borderRadius: 6, padding: "10px 14px", marginBottom: 4, border: `1px solid ${T.sagePale}` }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}><div><span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{r.name}</span><span style={{ fontSize: 10, color: T.textFaint, marginLeft: 8, textTransform: "uppercase" }}>{r.type}</span></div><div style={{ display: "flex", gap: 5, alignItems: "center" }}><span onClick={() => toggleReservationStatus(i,r.id)} style={{ cursor: "pointer" }}><StatusBadge status={r.status} /></span><span onClick={() => deleteItem(i,"reservations",r.id)} style={{ cursor: "pointer", fontSize: 14, color: T.textFaint }}>&times;</span></div></div>
+                  {(r.time||r.confirmation) && <div style={{ fontSize: 11, color: T.textLight, marginTop: 4, fontFamily: "'IBM Plex Mono',monospace" }}>{r.time}{r.time&&r.confirmation?" · ":""}{r.confirmation&&`Conf: ${r.confirmation}`}</div>}
+                  {r.notes && <div style={{ fontSize: 11, color: T.textFaint, marginTop: 2, fontStyle: "italic" }}>{r.notes}</div>}
+                </div>)}
+              </div>}
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}><Btn variant="small" onClick={() => setModal("activity")}>+ Activity</Btn><Btn variant="small" onClick={() => setModal("reservation")}>+ Reservation</Btn><Btn variant="small" onClick={() => setModal("transit")}>+ Transport</Btn></div>
+            </div>}
+          </Card>;
+        })}
+      </div>
+    </div>;
+  }
+
+  /* ── Hotels ── */
+  function renderHotels() {
+    const seen = new Set(); const unique = [];
+    days.filter(d=>d.hotel).forEach(d => { if(!seen.has(d.hotel.name)){seen.add(d.hotel.name); const n=days.filter(dd=>dd.hotel?.name===d.hotel.name); unique.push({...d.hotel,dates:n.map(x=>x.date),dayData:n,firstDayIndex:days.indexOf(n[0])}); } });
+    return <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>{unique.map((h,i) => <Card key={i} style={{ padding: "20px 24px", border: h.status==="missing"?`2px solid ${T.dangerBorder}`:undefined }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+        <div><div style={{ fontSize: 18, fontWeight: 400, fontFamily: "'Cormorant Garamond',serif", color: T.text }}>{h.name}</div><div style={{ fontSize: 12, color: T.textLight, marginTop: 4 }}>{h.address}</div>{h.url && <a href={h.url} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: T.sage, textDecoration: "none", fontWeight: 600, display: "inline-block", marginTop: 6 }}>View website &#8599;</a>}</div>
+        <div style={{ display: "flex", gap: 6, alignItems: "center", flexShrink: 0 }}><StatusBadge status={h.status} /><Btn variant="small" onClick={() => setModal({type:"hotel-edit",dayIndex:h.firstDayIndex})}>Edit</Btn></div>
+      </div>
+      <div style={{ borderTop: `1px solid ${T.borderLight}`, marginTop: 14, paddingTop: 12, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, fontSize: 12 }}>
+        <div><span style={{ color: T.textFaint }}>Dates</span><br /><span style={{ color: T.textMid, fontWeight: 500 }}>{h.dates.join(", ")}</span></div>
+        <div><span style={{ color: T.textFaint }}>Nights</span><br /><span style={{ color: T.textMid, fontWeight: 500 }}>{h.dates.length}</span></div>
+      </div>
+      <div style={{ borderTop: `1px solid ${T.borderLight}`, marginTop: 12, paddingTop: 12, fontFamily: "'IBM Plex Mono',monospace", fontSize: 11, color: T.textLight }}>
+        {h.dayData.map((d,di) => <div key={di} style={{ display: "flex", justifyContent: "space-between", padding: "4px 0" }}><span>{d.date}</span><span>{d.hotel.confirmation} {d.hotel.checkIn && <span style={{ color: T.success, fontWeight: 600, fontSize: 9, textTransform: "uppercase" }}>Check-in</span>}</span></div>)}
+      </div>
+    </Card>)}</div>;
+  }
+
+  /* ── Transport ── */
+  function renderTransport() {
+    const all = days.flatMap((d,di) => d.transit.map(t => ({...t, date: d.date, dayTitle: d.title, dayIndex: di})));
+    return <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <div style={{ display: "flex", justifyContent: "flex-end" }}><Btn variant="small" onClick={() => setModal("transit")}>+ Add transport</Btn></div>
+      {all.map((t,i) => <Card key={i} style={{ padding: "20px 24px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}><div><div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 2, color: T.sageMuted }}>{t.type}</div><div style={{ fontSize: 15, fontWeight: 400, fontFamily: "'Cormorant Garamond',serif", color: T.text, marginTop: 2 }}>{t.label}</div><div style={{ fontSize: 11, color: T.textFaint, marginTop: 2 }}>{t.date} — {t.dayTitle}</div></div><span onClick={() => toggleTransitStatus(t.dayIndex,t.id)} style={{ cursor: "pointer" }}><StatusBadge status={t.status} /></span></div>
+        <div style={{ borderTop: `1px solid ${T.borderLight}`, paddingTop: 8, fontFamily: "'IBM Plex Mono',monospace", fontSize: 12 }}>{Object.entries(t.details).map(([k,v]) => <div key={k} style={{ display: "flex", justifyContent: "space-between", padding: "4px 0", borderBottom: `1px solid ${T.borderLight}` }}><span style={{ color: T.textLight }}>{k}</span><span style={{ fontWeight: 500, color: T.text }}>{v}</span></div>)}</div>
+      </Card>)}
+    </div>;
+  }
+
+  /* ── Activities ── */
+  function renderActivities() {
+    return <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <div style={{ display: "flex", justifyContent: "flex-end" }}><Btn variant="small" onClick={() => setModal("activity")}>+ Add activity</Btn></div>
+      {days.filter(d=>d.activities.length>0).map((day,idx) => { const di=days.indexOf(day); return <Card key={idx} style={{ padding: "20px 24px" }}>
+        <div style={{ fontSize: 15, fontWeight: 400, fontFamily: "'Cormorant Garamond',serif", color: T.text, marginBottom: 10 }}>{day.date} — {day.title}</div>
+        {day.activities.map(a => <div key={a.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "7px 0", borderTop: `1px solid ${T.borderLight}` }}><span style={{ fontSize: 13, color: T.textMid }}>{a.text}</span><div style={{ display: "flex", gap: 5, alignItems: "center" }}><span onClick={() => toggleActivityStatus(di,a.id)} style={{ cursor: "pointer" }}><StatusBadge status={a.status} /></span><span onClick={() => deleteItem(di,"activities",a.id)} style={{ cursor: "pointer", fontSize: 14, color: T.textFaint }}>&times;</span></div></div>)}
+      </Card>; })}
+    </div>;
+  }
+
+  /* ── Reservations ── */
+  function renderReservations() {
+    const hasAny = days.some(d=>d.reservations.length>0);
+    return <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      <div style={{ display: "flex", justifyContent: "flex-end" }}><Btn onClick={() => setModal("reservation")}>+ Add reservation</Btn></div>
+      {!hasAny && <Card style={{ textAlign: "center", padding: "48px 24px" }}><div style={{ fontSize: 24, fontFamily: "'Cormorant Garamond',serif", fontWeight: 400, color: T.text }}>No Reservations Yet</div><div style={{ fontSize: 13, color: T.textLight, marginTop: 8, lineHeight: 1.7 }}>Add restaurant bookings, museum tickets, and tours as you confirm them.</div></Card>}
+      {days.filter(d=>d.reservations.length>0).map((day,idx) => { const di=days.indexOf(day); return <Card key={idx} style={{ padding: "20px 24px" }}>
+        <div style={{ fontSize: 15, fontFamily: "'Cormorant Garamond',serif", color: T.text, marginBottom: 10 }}>{day.date} — {day.title}</div>
+        {day.reservations.map(r => <div key={r.id} style={{ background: T.sageWash, borderRadius: 6, padding: "12px 16px", marginBottom: 6, border: `1px solid ${T.sagePale}` }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}><div><span style={{ fontSize: 14, fontWeight: 600, color: T.text }}>{r.name}</span><span style={{ fontSize: 10, color: T.textFaint, marginLeft: 10, textTransform: "uppercase", fontWeight: 600 }}>{r.type}</span></div><div style={{ display: "flex", gap: 5, alignItems: "center" }}><span onClick={() => toggleReservationStatus(di,r.id)} style={{ cursor: "pointer" }}><StatusBadge status={r.status} /></span><span onClick={() => deleteItem(di,"reservations",r.id)} style={{ cursor: "pointer", fontSize: 14, color: T.textFaint }}>&times;</span></div></div>
+          {(r.time||r.confirmation) && <div style={{ fontSize: 11, color: T.textLight, marginTop: 5, fontFamily: "'IBM Plex Mono',monospace" }}>{r.time}{r.time&&r.confirmation?" · ":""}{r.confirmation&&`Conf: ${r.confirmation}`}</div>}
+          {r.notes && <div style={{ fontSize: 11, color: T.textFaint, marginTop: 2, fontStyle: "italic" }}>{r.notes}</div>}
+        </div>)}
+      </Card>; })}
+    </div>;
+  }
+
+  /* ── Packing ── */
+  function renderPacking() {
+    const total = PACKING.reduce((s,c)=>s+c.items.length,0);
+    const done = Object.values(packing).filter(Boolean).length;
+    return <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      <Card style={{ padding: "16px 24px" }}><div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 8 }}><span style={{ fontWeight: 600, color: T.textMid }}>Packing progress</span><span style={{ fontFamily: "'IBM Plex Mono',monospace", color: T.textFaint, fontSize: 11 }}>{done} of {total}</span></div><PB v={done} t={total} c={T.sage} /></Card>
+      {PACKING.map((cat,ci) => { const cd=cat.items.filter(item=>packing[`${cat.name}-${item}`]).length; return <Card key={ci} style={{ padding: "20px 24px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}><span style={{ fontSize: 14, fontWeight: 600, color: T.text }}>{cat.name}</span><span style={{ fontSize: 11, color: T.textFaint, fontFamily: "'IBM Plex Mono',monospace" }}>{cd}/{cat.items.length}</span></div>
+        {cat.items.map((item,ii) => { const key=`${cat.name}-${item}`, isDone=packing[key]; return <div key={ii} onClick={() => togglePacking(cat.name,item)} style={{ display: "flex", alignItems: "center", gap: 12, padding: "8px 0", borderTop: `1px solid ${T.borderLight}`, cursor: "pointer", userSelect: "none" }}>
+          <div style={{ width: 20, height: 20, borderRadius: 4, flexShrink: 0, border: isDone?"none":`1.5px solid ${T.border}`, background: isDone?T.sage:"transparent", display: "flex", alignItems: "center", justifyContent: "center" }}>{isDone && <span style={{ color: T.white, fontSize: 12, fontWeight: 700 }}>&#10003;</span>}</div>
+          <span style={{ fontSize: 14, color: isDone?T.textFaint:T.textMid, textDecoration: isDone?"line-through":"none" }}>{item}</span>
+        </div>; })}
+      </Card>; })}
+    </div>;
+  }
+
+  /* ═══════════════════ RENDER ═══════════════════ */
+  return (
+    <div style={{ fontFamily: "'DM Sans','Helvetica Neue',sans-serif", minHeight: "100vh", background: T.cream }}>
+      <div className="header-safe" style={{ background: `linear-gradient(160deg,${T.sageDeep},${T.sageDark},#4a5940)`, padding: "20px 20px 16px", color: T.white, position: "sticky", top: 0, zIndex: 100 }}>
+        <div style={{ maxWidth: 680, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div><div style={{ fontSize: 9, letterSpacing: 4, textTransform: "uppercase", opacity: 0.5, marginBottom: 3 }}>Alex & Katherine</div><div style={{ fontSize: 24, fontWeight: 300, fontFamily: "'Cormorant Garamond',serif", letterSpacing: 1 }}>Italy 2026</div></div>
+          <div style={{ textAlign: "right", opacity: 0.6 }}><div style={{ fontSize: 12, fontFamily: "'IBM Plex Mono',monospace" }}>May 6–14</div></div>
+        </div>
+      </div>
+
+      <div style={{ background: T.white, borderBottom: `1px solid ${T.border}`, position: "sticky", top: 62, zIndex: 99, overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+        <div style={{ display: "flex", maxWidth: 680, margin: "0 auto", padding: "0 8px" }}>
+          {NAV.map(n => <button key={n.key} onClick={() => setPage(n.key)} style={{ padding: "11px 12px", border: "none", background: "none", cursor: "pointer", whiteSpace: "nowrap", fontSize: 12, fontWeight: page===n.key?700:400, color: page===n.key?T.sageDeep:T.textLight, borderBottom: page===n.key?`2px solid ${T.sage}`:"2px solid transparent", letterSpacing: 0.3, fontFamily: "'DM Sans',sans-serif" }}>{n.label}</button>)}
+        </div>
+      </div>
+
+      <div className="bottom-safe" style={{ maxWidth: 680, margin: "0 auto", padding: "16px 16px 40px" }}>
+        {page === "dashboard" && renderDashboard()}
+        {page === "timeline" && <RenderTimeline />}
+        {page === "hotels" && renderHotels()}
+        {page === "transport" && renderTransport()}
+        {page === "activities" && renderActivities()}
+        {page === "reservations" && renderReservations()}
+        {page === "packing" && renderPacking()}
+      </div>
+
+      {modal === "reservation" && <ReservationForm />}
+      {modal === "activity" && <ActivityForm />}
+      {modal === "transit" && <TransitForm />}
+      {modal?.type === "hotel-edit" && <HotelEditForm />}
+    </div>
+  );
+}
+
+ReactDOM.render(React.createElement(App), document.getElementById('root'));
+
+</script>
+</body>
+</html>
